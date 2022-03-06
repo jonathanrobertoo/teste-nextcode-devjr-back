@@ -20,7 +20,17 @@ app.use(morgan('combined'))
 const upload = multer()
 
 app.post('/images', upload.single('photo'), async (req, res) => {
+  if (!req.file) {
+    return res.status(500).send('No file was sent.')
+  }
+
   const { originalname: name, size, buffer } = req.file
+
+  const extension = name.split('.').pop().toLowerCase()
+
+  if (extension !== 'jpg' && extension !== 'jpeg' && extension !== 'png') {
+    return res.status(500).send('Invalid file extension.')
+  }
 
   const file = {
     name,
@@ -40,9 +50,13 @@ app.get('/images', async (req, res) => {
 app.get('/images/:image', async (req, res) => {
   const { image: imageId } = req.params
 
-  const image = await getImage(imageId)
+  const file = await getImage(imageId)
 
-  res.send(image)
+  if (!file) {
+    return res.status(404).send('File not found.')
+  }
+
+  res.send(file)
 })
 
 app.delete('/images/:image', async (req, res) => {
