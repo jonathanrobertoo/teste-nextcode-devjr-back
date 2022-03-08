@@ -64,7 +64,7 @@ app.delete('/images/:image', async (req, res) => {
 
   await deleteImage(imageId)
 
-  res.status(204).send({ message: 'Image removed.' })
+  res.status(204).end()
 })
 
 startDatabase().then(() => {
